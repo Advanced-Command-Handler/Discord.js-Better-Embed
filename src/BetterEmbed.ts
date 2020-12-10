@@ -1,5 +1,36 @@
 import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 
+type AnyObject = { [k: string] : any};
+
+const templates = {
+	basic: {
+		footer:    {
+			text:    '${client.user.username}',
+			iconURL: '${client.user.displayAvatarURL()}',
+		},
+		timestamp: new Date(),
+	},
+	color: {
+		color: '#4b5afd',
+	},
+	get complete() {
+		return {
+			...this.basic,
+			...this.color,
+			title:       '${title}',
+			description: '${description}',
+		};
+	},
+	get image() {
+		return {
+			...this.complete,
+			image: {
+				url: '${image}',
+			},
+		};
+	},
+};
+
 export default class BetterEmbed extends MessageEmbed {
 	public static limits = {
 		author:      {
@@ -17,34 +48,31 @@ export default class BetterEmbed extends MessageEmbed {
 		},
 	};
 	
-	public static templates = {
-		basic: {
-			footer:    {
-				text:    '${client.user.username}',
-				iconURL: '${client.user.displayAvatarURL()}',
-			},
-			timestamp: new Date(),
-		},
-		color: {
-			color: '#4b5afd',
-		},
-		get complete() {
-			return {
-				...this.basic,
-				...this.color,
-				title:       '${title}',
-				description: '${description}',
-			};
-		},
-		get image() {
-			return {
-				...this.complete,
-				image: {
-					url: '${image}',
-				},
-			};
-		},
-	};
+	static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject) {
+		if (typeof template === 'string')
+			if (templates[template]) template = templates[template];
+			else throw new Error(`Template '${template}' not found.`);
+		
+		template = JSON.parse(JSON.stringify(template));
+		
+		function setValues(object: AnyObject, values: AnyObject): MessageEmbedOptions {
+			for (const [name, value] of Object.entries(object)) {
+				if (!object.hasOwnProperty(name)) continue;
+				if (Array.isArray(value)) object[name] = value.map(v => setValues(v, values));
+				if (typeof value === 'object') {
+					object[name] = setValues(value, values);
+					continue;
+				}
+				
+				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => (values.hasOwnProperty(value.split('.')[0]) ? `\${values.${value}}` : value));
+				object[name] = eval(`\`${code}\``);
+			}
+			
+			return object;
+		}
+		
+		return new BetterEmbed(setValues(template as AnyObject, values));
+	}
 	
 	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
 		super(data);
