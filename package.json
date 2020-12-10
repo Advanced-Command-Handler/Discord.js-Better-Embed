@@ -29,7 +29,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"prepublish": "npm run build",
+		"prepare": "npm run build",
 		"prettier": "prettier package.json README.md tsconfig.json src/**.ts --write"
 	},
 	"readme": "https://github.com/Ayfri/Better-Embed/blob/master/README.md",
