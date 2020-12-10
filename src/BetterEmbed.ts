@@ -62,4 +62,21 @@ export default class BetterEmbed extends MessageEmbed {
 			if (field.value?.length > BetterEmbed.limits.fields.value) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].value is too long (${BetterEmbed.limits.fields.value}).`);
 		});
 	}
+	
+	cutIfTooLong() {
+		function cutWithLength(text: string, maxLength: number) {
+			return text.length > maxLength ? `${text.substring(0, maxLength - 3)}...` : text;
+		}
+		
+		if (this.author?.name) this.author.name = cutWithLength(this.author.name, BetterEmbed.limits.author.name);
+		if(this.description) this.description = cutWithLength(this.description, BetterEmbed.limits.description);
+		if(this.title) this.title = cutWithLength(this.title, BetterEmbed.limits.title);
+		if (this.fields) {
+			if (this.fields.length > BetterEmbed.limits.fields.size) this.fields = this.fields.slice(0, BetterEmbed.limits.fields.size) ?? [];
+			this.fields.forEach(field => {
+				field.name = cutWithLength(field.name ?? '', BetterEmbed.limits.fields.name);
+				field.value = cutWithLength(field.value ?? '', BetterEmbed.limits.fields.value);
+			});
+		}
+	}
 }
