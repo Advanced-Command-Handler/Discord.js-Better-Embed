@@ -48,5 +48,18 @@ export default class BetterEmbed extends MessageEmbed {
 	
 	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
 		super(data);
+		this.checkSize();
+	}
+	
+	checkSize() {
+		if (this.title && this.title.length > BetterEmbed.limits.title) throw new RangeError(`embed.title is too long (${BetterEmbed.limits.title}).`);
+		if (this.author?.name && this.author.name.length > BetterEmbed.limits.author.name) throw new RangeError(`embed.author.name is too long (${BetterEmbed.limits.author.name}).`);
+		if (this.description && this.description.length > BetterEmbed.limits.description) throw new RangeError(`embed.description is too long (${BetterEmbed.limits.description}).`);
+		if (this.title && this.title.length > BetterEmbed.limits.title) throw new RangeError(`embed.title is too long (${BetterEmbed.limits.title}).`);
+		if (this.fields?.length > BetterEmbed.limits.fields.size) throw new RangeError(`Too much fields is too long (${BetterEmbed.limits.fields.size}).`);
+		this.fields.forEach(field => {
+			if (field.name?.length > BetterEmbed.limits.fields.name) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].name is too long (${BetterEmbed.limits.fields.name}).`);
+			if (field.value?.length > BetterEmbed.limits.fields.value) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].value is too long (${BetterEmbed.limits.fields.value}).`);
+		});
 	}
 }
