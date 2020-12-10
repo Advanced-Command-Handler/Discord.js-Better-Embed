@@ -52,8 +52,8 @@ class BetterEmbed extends MessageEmbed {
 		super(data);
 		this.checkSize();
 	}
-
-	static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject) {
+	
+	public static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject) {
 		if (typeof template === 'string')
 			if (templates[template]) template = templates[template];
 			else throw new Error(`Template '${template}' not found.`);
@@ -79,7 +79,7 @@ class BetterEmbed extends MessageEmbed {
 		return new BetterEmbed(setValues(template as AnyObject, values));
 	}
 
-	checkSize() {
+	public checkSize() {
 		if (this.title && this.title.length > limits.title) throw new RangeError(`embed.title is too long (${limits.title}).`);
 		if (this.author?.name && this.author.name.length > limits.author.name) throw new RangeError(`embed.author.name is too long (${limits.author.name}).`);
 		if (this.description && this.description.length > limits.description) throw new RangeError(`embed.description is too long (${limits.description}).`);
@@ -90,8 +90,8 @@ class BetterEmbed extends MessageEmbed {
 			if (field.value?.length > limits.fields.value) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].value is too long (${limits.fields.value}).`);
 		});
 	}
-
-	cutIfTooLong() {
+	
+	public cutIfTooLong() {
 		function cutWithLength(text: string, maxLength: number) {
 			return text.length > maxLength ? `${text.substring(0, maxLength - 3)}...` : text;
 		}
