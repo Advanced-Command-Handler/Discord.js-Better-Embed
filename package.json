@@ -16,6 +16,7 @@
 		"embed",
 		"discord-embed"
 	],
+	"main": "dist/BetterEmbed.js",
 	"name": "better-embed",
 	"readme": "https://github.com/Ayfri/Better-Embed/blob/master/README.md",
 	"repository": {
