@@ -2,7 +2,7 @@ import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 
 type AnyObject = { [k: string]: any };
 
-const templates = {
+const templates: { [k: string]: MessageEmbedOptions } = {
 	basic: {
 		footer:    {
 			text:    '${client.user.username}',
