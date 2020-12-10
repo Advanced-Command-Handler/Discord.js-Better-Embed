@@ -27,6 +27,10 @@
 		"arrowParens": "avoid",
 		"singleQuote": true
 	},
+	"scripts": {
+		"build": "tsc",
+		"prettier": "prettier package.json README.md tsconfig.json src/**.ts"
+	},
 	"readme": "https://github.com/Ayfri/Better-Embed/blob/master/README.md",
 	"repository": {
 		"type": "git",
