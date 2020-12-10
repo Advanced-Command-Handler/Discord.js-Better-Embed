@@ -12,6 +12,7 @@
 		"prettier": "^2.2.1",
 		"typescript": "^4.1.2"
 	},
+	"homepage": "https://github.com/Ayfri/Better-Embed",
 	"keywords": [
 		"discord.js",
 		"embed",
@@ -27,15 +28,16 @@
 		"arrowParens": "avoid",
 		"singleQuote": true
 	},
-	"scripts": {
-		"build": "tsc",
-		"prepare": "npm run build",
-		"prettier": "prettier package.json README.md tsconfig.json src/**.ts --write"
-	},
 	"readme": "https://github.com/Ayfri/Better-Embed/blob/master/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Ayfri/Better-Embed"
 	},
+	"scripts": {
+		"build": "tsc",
+		"prepare": "npm run build",
+		"prettier": "prettier package.json README.md tsconfig.json src/**.ts --write"
+	},
+	"types": "dist",
 	"version": "1.0.2"
 }
