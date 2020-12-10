@@ -1,6 +1,6 @@
 import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 
-type AnyObject = { [k: string] : any};
+type AnyObject = { [k: string]: any };
 
 const templates = {
 	basic: {
@@ -31,22 +31,28 @@ const templates = {
 	},
 };
 
-export default class BetterEmbed extends MessageEmbed {
-	public static limits = {
-		author:      {
-			name: 256,
-		},
-		title:       256,
-		description: 2048,
-		footer:      {
-			text: 2048,
-		},
-		fields:      {
-			size:  25,
-			name:  256,
-			value: 1024,
-		},
-	};
+const limits = {
+	author:      {
+		name: 256,
+	},
+	title:       256,
+	description: 2048,
+	footer:      {
+		text: 2048,
+	},
+	fields:      {
+		size:  25,
+		name:  256,
+		value: 1024,
+	},
+};
+
+class BetterEmbed extends MessageEmbed {
+	
+	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
+		super(data);
+		this.checkSize();
+	}
 	
 	static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject) {
 		if (typeof template === 'string')
@@ -64,7 +70,9 @@ export default class BetterEmbed extends MessageEmbed {
 					continue;
 				}
 				
-				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => (values.hasOwnProperty(value.split('.')[0]) ? `\${values.${value}}` : value));
+				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => (values.hasOwnProperty(value.split('.')[0])
+				                                                                          ? `\${values.${value}}`
+				                                                                          : value));
 				object[name] = eval(`\`${code}\``);
 			}
 			
@@ -74,20 +82,15 @@ export default class BetterEmbed extends MessageEmbed {
 		return new BetterEmbed(setValues(template as AnyObject, values));
 	}
 	
-	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
-		super(data);
-		this.checkSize();
-	}
-	
 	checkSize() {
-		if (this.title && this.title.length > BetterEmbed.limits.title) throw new RangeError(`embed.title is too long (${BetterEmbed.limits.title}).`);
-		if (this.author?.name && this.author.name.length > BetterEmbed.limits.author.name) throw new RangeError(`embed.author.name is too long (${BetterEmbed.limits.author.name}).`);
-		if (this.description && this.description.length > BetterEmbed.limits.description) throw new RangeError(`embed.description is too long (${BetterEmbed.limits.description}).`);
-		if (this.title && this.title.length > BetterEmbed.limits.title) throw new RangeError(`embed.title is too long (${BetterEmbed.limits.title}).`);
-		if (this.fields?.length > BetterEmbed.limits.fields.size) throw new RangeError(`Too much fields is too long (${BetterEmbed.limits.fields.size}).`);
+		if (this.title && this.title.length > limits.title) throw new RangeError(`embed.title is too long (${limits.title}).`);
+		if (this.author?.name && this.author.name.length > limits.author.name) throw new RangeError(`embed.author.name is too long (${limits.author.name}).`);
+		if (this.description && this.description.length > limits.description) throw new RangeError(`embed.description is too long (${limits.description}).`);
+		if (this.title && this.title.length > limits.title) throw new RangeError(`embed.title is too long (${limits.title}).`);
+		if (this.fields?.length > limits.fields.size) throw new RangeError(`Too much fields is too long (${limits.fields.size}).`);
 		this.fields.forEach(field => {
-			if (field.name?.length > BetterEmbed.limits.fields.name) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].name is too long (${BetterEmbed.limits.fields.name}).`);
-			if (field.value?.length > BetterEmbed.limits.fields.value) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].value is too long (${BetterEmbed.limits.fields.value}).`);
+			if (field.name?.length > limits.fields.name) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].name is too long (${limits.fields.name}).`);
+			if (field.value?.length > limits.fields.value) throw new RangeError(`embed.fields[${this.fields.indexOf(field)}].value is too long (${limits.fields.value}).`);
 		});
 	}
 	
@@ -96,15 +99,27 @@ export default class BetterEmbed extends MessageEmbed {
 			return text.length > maxLength ? `${text.substring(0, maxLength - 3)}...` : text;
 		}
 		
-		if (this.author?.name) this.author.name = cutWithLength(this.author.name, BetterEmbed.limits.author.name);
-		if(this.description) this.description = cutWithLength(this.description, BetterEmbed.limits.description);
-		if(this.title) this.title = cutWithLength(this.title, BetterEmbed.limits.title);
+		if (this.author?.name) this.author.name = cutWithLength(this.author.name, limits.author.name);
+		if (this.description) this.description = cutWithLength(this.description, limits.description);
+		if (this.title) this.title = cutWithLength(this.title, limits.title);
 		if (this.fields) {
-			if (this.fields.length > BetterEmbed.limits.fields.size) this.fields = this.fields.slice(0, BetterEmbed.limits.fields.size) ?? [];
+			if (this.fields.length > limits.fields.size) this.fields = this.fields.slice(0, limits.fields.size) ?? [];
 			this.fields.forEach(field => {
-				field.name = cutWithLength(field.name ?? '', BetterEmbed.limits.fields.name);
-				field.value = cutWithLength(field.value ?? '', BetterEmbed.limits.fields.value);
+				field.name = cutWithLength(field.name ?? '', limits.fields.name);
+				field.value = cutWithLength(field.value ?? '', limits.fields.value);
 			});
 		}
 	}
 }
+
+export default {
+	BetterEmbed,
+	templates,
+	limits,
+};
+
+module.exports = {
+	BetterEmbed,
+	templates,
+	limits,
+};
