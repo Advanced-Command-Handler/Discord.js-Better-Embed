@@ -38,8 +38,8 @@ declare const templates: {
     };
 };
 declare class BetterEmbed extends MessageEmbed {
-    static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject): BetterEmbed;
     constructor(data?: MessageEmbed | MessageEmbedOptions);
+    static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject): BetterEmbed;
     checkSize(): void;
     cutIfTooLong(): void;
 }

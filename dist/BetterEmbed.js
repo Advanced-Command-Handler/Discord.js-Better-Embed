@@ -45,6 +45,10 @@ const limits = {
     },
 };
 class BetterEmbed extends discord_js_1.MessageEmbed {
+    constructor(data) {
+        super(data);
+        this.checkSize();
+    }
     static fromTemplate(template, values) {
         if (typeof template === 'string')
             if (templates[template])
@@ -62,16 +66,14 @@ class BetterEmbed extends discord_js_1.MessageEmbed {
                     object[name] = setValues(value, values);
                     continue;
                 }
-                const code = value.replace(/\$\{([^}]+)\}/gu, (_, value) => (values.hasOwnProperty(value.split('.')[0]) ? `\${values.${value}}` : value));
+                const code = value.replace(/\$\{([^}]+)\}/gu, (_, value) => (values.hasOwnProperty(value.split('.')[0])
+                    ? `\${values.${value}}`
+                    : value));
                 object[name] = eval(`\`${code}\``);
             }
             return object;
         }
         return new BetterEmbed(setValues(template, values));
-    }
-    constructor(data) {
-        super(data);
-        this.checkSize();
     }
     checkSize() {
         if (this.title && this.title.length > limits.title)
@@ -114,5 +116,10 @@ class BetterEmbed extends discord_js_1.MessageEmbed {
 exports.default = {
     BetterEmbed,
     templates,
-    limits
+    limits,
+};
+module.exports = {
+    BetterEmbed,
+    templates,
+    limits,
 };
