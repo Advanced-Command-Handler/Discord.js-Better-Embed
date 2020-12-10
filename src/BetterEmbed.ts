@@ -1,26 +1,26 @@
-import {MessageEmbed} from 'discord.js';
+import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 
 export default class BetterEmbed extends MessageEmbed {
 	public static limits = {
-		author: {
+		author:      {
 			name: 256,
 		},
-		title: 256,
+		title:       256,
 		description: 2048,
-		footer: {
+		footer:      {
 			text: 2048,
 		},
-		fields: {
-			size: 25,
-			name: 256,
+		fields:      {
+			size:  25,
+			name:  256,
 			value: 1024,
 		},
-	}
+	};
 	
 	public static templates = {
 		basic: {
-			footer: {
-				text: '${client.user.username}',
+			footer:    {
+				text:    '${client.user.username}',
 				iconURL: '${client.user.displayAvatarURL()}',
 			},
 			timestamp: new Date(),
@@ -32,7 +32,7 @@ export default class BetterEmbed extends MessageEmbed {
 			return {
 				...this.basic,
 				...this.color,
-				title: '${title}',
+				title:       '${title}',
 				description: '${description}',
 			};
 		},
@@ -45,4 +45,8 @@ export default class BetterEmbed extends MessageEmbed {
 			};
 		},
 	};
+	
+	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
+		super(data);
+	}
 }
