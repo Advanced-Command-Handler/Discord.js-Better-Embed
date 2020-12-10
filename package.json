@@ -1,0 +1,26 @@
+{
+	"author": "Ayfri",
+	"bugs": {
+		"url": "https://github.com/Ayfri/Better-Embed/issues"
+	},
+	"dependencies": {
+		"discord.js": "^12.x"
+	},
+	"description": "A npm package that helps you create better Discord Embeds using discord.js.",
+	"devDependencies": {
+		"tsc": "^1.20150623.0",
+		"typescript": "^4.1.2"
+	},
+	"keywords": [
+		"discord.js",
+		"embed",
+		"discord-embed"
+	],
+	"name": "better-embed",
+	"readme": "https://github.com/Ayfri/Better-Embed/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Ayfri/Better-Embed"
+	},
+	"version": "0.0.1"
+}
