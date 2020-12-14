@@ -39,5 +39,5 @@
 		"prettier": "prettier package.json README.md tsconfig.json src/**.ts --write"
 	},
 	"types": "dist/BetterEmbed.d.ts",
-	"version": "1.0.3"
+	"version": "1.0.4"
 }
