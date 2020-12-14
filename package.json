@@ -38,6 +38,6 @@
 		"prepare": "npm run build",
 		"prettier": "prettier package.json README.md tsconfig.json src/**.ts --write"
 	},
-	"types": "dist",
+	"types": "dist/BetterEmbed.d.ts",
 	"version": "1.0.3"
 }
