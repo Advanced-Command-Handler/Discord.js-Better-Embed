@@ -109,13 +109,7 @@ class BetterEmbed extends MessageEmbed {
 	}
 }
 
-export default {
-	BetterEmbed,
-	templates,
-	limits,
-};
-
-module.exports = {
+export {
 	BetterEmbed,
 	templates,
 	limits,
