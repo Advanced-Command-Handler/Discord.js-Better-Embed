@@ -18,7 +18,7 @@
 		"embed",
 		"discord-embed"
 	],
-	"main": "dist/main.js",
+	"main": "dist/index.js",
 	"name": "discord.js-better-embed",
 	"prettier": {
 		"useTabs": true,
