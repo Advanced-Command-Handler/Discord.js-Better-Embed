@@ -6,3 +6,7 @@
 # Better-Embed
 
 A npm package that helps you create better Discord Embeds using discord.js.
+
+## Documentation
+
+See [here](https://github.com/Advanced-Command-Handler/Advanced-Command-Handler/wiki/BetterEmbed-and-templates).
