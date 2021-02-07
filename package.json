@@ -23,12 +23,12 @@
 	"main": "dist/index.js",
 	"name": "discord.js-better-embed",
 	"prettier": {
-		"useTabs": true,
-		"bracketSpacing": false,
-		"tabWidth": 4,
-		"printWidth": 200,
 		"arrowParens": "avoid",
-		"singleQuote": true
+		"bracketSpacing": false,
+		"printWidth": 200,
+		"singleQuote": true,
+		"tabWidth": 4,
+		"useTabs": true
 	},
 	"readme": "https://github.com/Ayfri/Better-Embed/blob/master/README.md",
 	"repository": {

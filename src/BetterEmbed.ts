@@ -52,7 +52,7 @@ class BetterEmbed extends MessageEmbed {
 		super(data);
 		this.checkSize();
 	}
-	
+
 	public static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject) {
 		if (typeof template === 'string')
 			if (templates[template]) template = templates[template];
@@ -86,10 +86,11 @@ class BetterEmbed extends MessageEmbed {
 		if (this.fields?.length > limits.fields.size) throw new RangeError(`Too much fields (${limits.fields.size}).`);
 		this.fields.forEach(field => {
 			if (field.name?.length > limits.fields.name) throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].name' is too long: ${field.name.length} (max: ${limits.fields.name}).`);
-			if (field.value?.length > limits.fields.value) throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].value' is too long: ${field.value.length} (max: ${limits.fields.value}).`);
+			if (field.value?.length > limits.fields.value)
+				throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].value' is too long: ${field.value.length} (max: ${limits.fields.value}).`);
 		});
 	}
-	
+
 	public cutIfTooLong() {
 		function cutWithLength(text: string, maxLength: number) {
 			return text.length > maxLength ? `${text.substring(0, maxLength - 3)}...` : text;
@@ -108,8 +109,4 @@ class BetterEmbed extends MessageEmbed {
 	}
 }
 
-export {
-	BetterEmbed,
-	templates,
-	limits,
-};
+export {BetterEmbed, templates, limits};
