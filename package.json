@@ -16,7 +16,9 @@
 	"keywords": [
 		"discord.js",
 		"embed",
-		"discord-embed"
+		"discord-embed",
+		"better-embed",
+		"embed-discord"
 	],
 	"main": "dist/index.js",
 	"name": "discord.js-better-embed",
