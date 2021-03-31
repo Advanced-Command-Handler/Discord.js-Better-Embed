@@ -2,7 +2,9 @@ import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 
 type AnyObject = {[k: string]: any};
 
-const templates: {[k: string]: MessageEmbedOptions} = {
+type Templates = {[k in string | 'basic' | 'color' | 'complete' | 'image']: MessageEmbedOptions}
+
+const templates: Templates = {
 	basic: {
 		footer: {
 			text: '${client.user.username}',
@@ -53,7 +55,7 @@ class BetterEmbed extends MessageEmbed {
 		this.checkSize();
 	}
 
-	public static fromTemplate(template: keyof typeof templates | typeof templates | MessageEmbedOptions, values: AnyObject) {
+	public static fromTemplate(template: keyof Templates | MessageEmbedOptions, values: AnyObject) {
 		if (typeof template === 'string')
 			if (templates[template]) template = templates[template];
 			else throw new Error(`Template '${template}' not found.`);
