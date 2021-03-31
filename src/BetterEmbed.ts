@@ -2,7 +2,9 @@ import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 
 type AnyObject = {[k: string]: any};
 
-type Templates = {[k in string | 'basic' | 'color' | 'complete' | 'image']: MessageEmbedOptions}
+type Template = MessageEmbedOptions;
+
+type Templates = {[k in string | 'basic' | 'color' | 'complete' | 'image']: Template}
 
 export const templates: Templates = {
 	basic: {
@@ -50,19 +52,19 @@ export const limits = {
 };
 
 export class BetterEmbed extends MessageEmbed {
-	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
+	public constructor(data?: MessageEmbed | Template) {
 		super(data);
 		this.checkSize();
 	}
 
-	public static fromTemplate(template: keyof Templates | MessageEmbedOptions, values: AnyObject) {
+	public static fromTemplate(template: keyof Templates | Template, values: AnyObject): BetterEmbed {
 		if (typeof template === 'string')
 			if (templates[template]) template = templates[template];
 			else throw new Error(`Template '${template}' not found.`);
 
 		template = JSON.parse(JSON.stringify(template));
 
-		function setValues(object: AnyObject, values: AnyObject): MessageEmbedOptions {
+		function setValues(object: AnyObject, values: AnyObject): Template {
 			for (const [name, value] of Object.entries(object)) {
 				if (!object.hasOwnProperty(name)) continue;
 				if (Array.isArray(value)) object[name] = value.map(v => setValues(v, values));
