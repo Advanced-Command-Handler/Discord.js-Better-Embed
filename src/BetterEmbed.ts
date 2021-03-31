@@ -4,7 +4,7 @@ type AnyObject = {[k: string]: any};
 
 type Templates = {[k in string | 'basic' | 'color' | 'complete' | 'image']: MessageEmbedOptions}
 
-const templates: Templates = {
+export const templates: Templates = {
 	basic: {
 		footer: {
 			text: '${client.user.username}',
@@ -33,7 +33,7 @@ const templates: Templates = {
 	},
 };
 
-const limits = {
+export const limits = {
 	author: {
 		name: 256,
 	},
@@ -49,7 +49,7 @@ const limits = {
 	},
 };
 
-class BetterEmbed extends MessageEmbed {
+export class BetterEmbed extends MessageEmbed {
 	public constructor(data?: MessageEmbed | MessageEmbedOptions) {
 		super(data);
 		this.checkSize();
@@ -110,5 +110,3 @@ class BetterEmbed extends MessageEmbed {
 		}
 	}
 }
-
-export {BetterEmbed, templates, limits};
