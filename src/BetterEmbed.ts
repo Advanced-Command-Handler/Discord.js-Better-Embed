@@ -80,6 +80,10 @@ export class BetterEmbed extends MessageEmbed {
 
 		return new BetterEmbed(setValues(template as AnyObject, values));
 	}
+	
+	public static LENGTH_LIMITS = limits;
+	
+	public static TEMPLATES = templates;
 
 	public checkSize() {
 		if (this.title && this.title.length > limits.title) throw new RangeError(`'embed.title' is too long: ${this.title.length} (max: ${limits.title}).`);
