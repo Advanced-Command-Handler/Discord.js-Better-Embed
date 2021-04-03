@@ -3,8 +3,10 @@ import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
 type AnyObject = {[k: string]: any};
 
 type Template = MessageEmbedOptions;
-
 type Templates = { [k in string | 'basic' | 'color' | 'complete' | 'image']: Template }
+
+type CheckSizeKey = keyof Template | string;
+type CheckSizeContent = Template[keyof Template];
 
 export const templates: Templates = {
 	basic: {
@@ -90,14 +92,12 @@ export class BetterEmbed extends MessageEmbed {
 	
 	public checkSize(field: 'fields'): {index: number, limit: number} & ({name: boolean} | {value: boolean}) | boolean
 	public checkSize(field: keyof Template): boolean;
-	public checkSize(): {[k in keyof Template | string]: {content: string | Template[keyof Template], limit: number}}
+	public checkSize(): { [k in CheckSizeKey]: {content: CheckSizeContent, limit: number} }
 	public checkSize(field?: keyof Template) {
 		if (!field) {
-			type key = keyof Template | string;
-			type content = string | Template[keyof Template]
-			const fields: {[k in key]: {content: content, limit: number}} = {};
+			const fields: { [k in CheckSizeKey]: {content: CheckSizeContent, limit: number} } = {};
 			
-			function addField(name: key, content: content, limit: number) {
+			function addField(name: CheckSizeKey, content: CheckSizeContent, limit: number) {
 				fields[name] = {
 					content,
 					limit,
@@ -127,14 +127,14 @@ export class BetterEmbed extends MessageEmbed {
 							return {
 								index,
 								name: true,
-								limit: limits.fields.name
-							}
+								limit: limits.fields.name,
+							};
 						} else if (field.value.length > limits.fields.value) {
 							return {
 								index,
 								value: true,
-								limit: limits.fields.value
-							}
+								limit: limits.fields.value,
+							};
 						}
 					}
 					return false;
