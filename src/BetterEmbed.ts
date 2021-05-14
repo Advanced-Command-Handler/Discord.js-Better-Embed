@@ -78,9 +78,10 @@ export class BetterEmbed extends MessageEmbed {
 					continue;
 				}
 				
-				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => (values.hasOwnProperty(value.split('.')[0])
-				                                                                          ? `\${values.${value}}`
-				                                                                          : value));
+				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => {
+						return values.hasOwnProperty(value.split('.')[0]) ? `\${values.${value}}` : value;
+					},
+				);
 				object[name] = eval(`\`${code}\``);
 			}
 			
@@ -152,7 +153,32 @@ export class BetterEmbed extends MessageEmbed {
 		}
 	}
 	
-	public throwIfTooLong() {
+	public throwIfTooLong(field: keyof Template): void;
+	public throwIfTooLong(field?: keyof Template) {
+		if (field) {
+			const tooLong = this.checkSize(field);
+			if (!tooLong) return;
+			switch (field) {
+				case 'title':
+				case 'author':
+				case 'description':
+					if (field === 'author' ? !this.author?.name?.length : !this[field]?.length) return;
+					const name = field === 'author' ? 'author.name' : field;
+					
+					const limit = field === 'author' ? limits.author.name : limits[field];
+					const length = field === 'author' ? this.author!.name!.length : this[field]!.length;
+					throw new RangeError(`'embed.${name}' is too long: ${length} (max: ${limit}).`);
+				case 'fields':
+					const tooLongFields = this.checkSize(field);
+					if (typeof tooLongFields === 'boolean') throw new RangeError(`Too much fields (${limits.fields.size}).`);
+					else {
+						const name = 'name' in tooLongFields ? 'value' : 'name';
+						// TODO : Find a fix for typings.
+						throw new RangeError(`'embed.fields[${tooLongFields.index}].${name}' is too long: ${(tooLongFields as any)[name]!.length}`);
+					}
+			}
+		}
+		
 		if (this.title && this.title.length > limits.title) throw new RangeError(`'embed.title' is too long: ${this.title.length} (max: ${limits.title}).`);
 		if (this.author?.name && this.author.name.length > limits.author.name) throw new RangeError(`'embed.author.name' is too long: ${this.author.name.length} (max: ${limits.author.name}).`);
 		if (this.description && this.description.length > limits.description) throw new RangeError(`'embed.description' is too long: ${this.description.length} (max: ${limits.description}).`);
