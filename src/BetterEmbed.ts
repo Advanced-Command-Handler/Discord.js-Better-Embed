@@ -1,4 +1,5 @@
-import {MessageEmbed, MessageEmbedOptions} from 'discord.js';
+import {MessageAttachment, MessageEmbed, MessageEmbedOptions} from 'discord.js';
+import path from 'path';
 
 type AnyObject = {[k: string]: any};
 
@@ -151,6 +152,18 @@ export class BetterEmbed extends MessageEmbed {
 			default:
 				return true;
 		}
+	}
+	
+	public setImageFromFile(link: string) {
+		const attachment = new MessageAttachment(link, path.basename(link));
+		this.attachFiles([attachment]);
+		this.setImage(`attachment://${attachment.name}`);
+	}
+	
+	public setThumbnailFromFile(link: string) {
+		const attachment = new MessageAttachment(link, path.basename(link));
+		this.attachFiles([attachment]);
+		this.setThumbnail(`attachment://${attachment.name}`);
 	}
 	
 	public throwIfTooLong(field: keyof Template): void;
