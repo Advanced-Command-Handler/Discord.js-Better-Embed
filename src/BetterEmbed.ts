@@ -43,7 +43,7 @@ export const limits = {
 		name: 256,
 	},
 	title: 256,
-	description: 2048,
+	description: 4096,
 	footer: {
 		text: 2048,
 	},
