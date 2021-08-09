@@ -42,7 +42,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"prepare": "npm run build",
+		"prepublishOnly": "npm run prettier && npm run build",
 		"prettier": "prettier *.json *.md src --write"
 	},
 	"types": "dist",
