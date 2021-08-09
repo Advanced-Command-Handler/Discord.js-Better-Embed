@@ -1,34 +1,34 @@
 import {MessageAttachment, MessageEmbed} from 'discord.js';
-import {AnyObject, CheckSizeContent, CheckSizeKey, Template, TemplatesValues} from './types'
+import {AnyObject, CheckSizeContent, CheckSizeKey, Template, TemplatesValues} from './types';
 
 export const templates: TemplatesValues = {
-    basic: {
-        footer: {
-            text: '${client.user.username}',
-            iconURL: '${client.user.displayAvatarURL()}',
-        },
-        timestamp: new Date()
-    },
-    color: {
-        color: '#4b5afd'
-    },
-    //@ts-ignore
-    get complete() {
-        return {
-            ...this.basic,
-            ...this.color,
-            description: '${description}',
-            title: '${title}'
-        }
-    },
-    get image() {
-        return {
-            ...this.complete,
-            image: {
-                url: '${url}'
-            }
-        }
-    }
+	basic: {
+		footer: {
+			text: '${client.user.username}',
+			iconURL: '${client.user.displayAvatarURL()}',
+		},
+		timestamp: new Date(),
+	},
+	color: {
+		color: '#4b5afd',
+	},
+	//@ts-ignore
+	get complete() {
+		return {
+			...this.basic,
+			...this.color,
+			description: '${description}',
+			title: '${title}',
+		};
+	},
+	get image() {
+		return {
+			...this.complete,
+			image: {
+				url: '${url}',
+			},
+		};
+	},
 };
 
 export const limits = {
@@ -47,9 +47,9 @@ export const limits = {
 	},
 };
 
-export type Templates = typeof templates
-type ValuesFromTemplateKey<T extends (string), P = Templates[T]> = P extends Template ? P['values'] : {};
-type Values<T extends (string) | Template> = T extends Template ? T['values'] : T extends string ? ValuesFromTemplateKey<T> : AnyObject | undefined;
+export type Templates = typeof templates;
+type ValuesFromTemplateKey<T extends string, P = Templates[T]> = P extends Template<infer V> ? V : {};
+type Values<T extends string | Template> = T extends Template<infer V> ? V : T extends string ? ValuesFromTemplateKey<T> : AnyObject | undefined;
 
 export class BetterEmbed extends MessageEmbed {
 	public static LENGTH_LIMITS = limits;
@@ -60,11 +60,14 @@ export class BetterEmbed extends MessageEmbed {
 		this.checkSize();
 	}
 
-    public static isTemplate(key: string): key is keyof Templates & string {
-        return templates[key] !== undefined;
-    }
+	public static isTemplate(key: string): key is keyof Templates & string {
+		return templates[key] !== undefined;
+	}
 
-	public static fromTemplate<T extends (keyof Templates & string) | Template, V extends AnyObject | undefined = Values<T>>(template: T, values?: V): BetterEmbed {
+	public static fromTemplate<T extends (keyof Templates & string) | Template, V extends AnyObject | undefined = Values<T>>(
+		template: T,
+		values?: V
+	): BetterEmbed {
 		if (typeof template === 'string')
 			if (templates[template]) template = templates[template] as T;
 			else throw new Error(`Template '${template}' not found.`);
@@ -182,17 +185,24 @@ export class BetterEmbed extends MessageEmbed {
 					if (typeof tooLongFields === 'boolean') throw new RangeError(`Too much fields (${limits.fields.size}).`);
 					else {
 						const name = 'name' in tooLongFields ? 'value' : 'name';
-						throw new RangeError(`'embed.fields[${tooLongFields.index}].${name}' is too long: ${this.fields[tooLongFields.index][name].length} (max: ${tooLongFields.limit})`);
+						throw new RangeError(
+							`'embed.fields[${tooLongFields.index}].${name}' is too long: ${this.fields[tooLongFields.index][name].length} (max: ${
+								tooLongFields.limit
+							})`
+						);
 					}
 			}
 		}
 
 		if (this.title && this.title.length > limits.title) throw new RangeError(`'embed.title' is too long: ${this.title.length} (max: ${limits.title}).`);
-		if (this.author?.name && this.author.name.length > limits.author.name) throw new RangeError(`'embed.author.name' is too long: ${this.author.name.length} (max: ${limits.author.name}).`);
-		if (this.description && this.description.length > limits.description) throw new RangeError(`'embed.description' is too long: ${this.description.length} (max: ${limits.description}).`);
+		if (this.author?.name && this.author.name.length > limits.author.name)
+			throw new RangeError(`'embed.author.name' is too long: ${this.author.name.length} (max: ${limits.author.name}).`);
+		if (this.description && this.description.length > limits.description)
+			throw new RangeError(`'embed.description' is too long: ${this.description.length} (max: ${limits.description}).`);
 		if (this.fields?.length > limits.fields.size) throw new RangeError(`Too much fields (${limits.fields.size}).`);
 		this.fields.forEach(field => {
-			if (field.name?.length > limits.fields.name) throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].name' is too long: ${field.name.length} (max: ${limits.fields.name}).`);
+			if (field.name?.length > limits.fields.name)
+				throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].name' is too long: ${field.name.length} (max: ${limits.fields.name}).`);
 			if (field.value?.length > limits.fields.value)
 				throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].value' is too long: ${field.value.length} (max: ${limits.fields.value}).`);
 		});
