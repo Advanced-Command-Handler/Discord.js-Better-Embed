@@ -1,1 +1,2 @@
-export * from './BetterEmbed.js';
+export * from './BetterEmbed';
+export type {AnyObject, Template} from './types';
