@@ -1,41 +1,34 @@
-import {MessageAttachment, MessageEmbed, MessageEmbedOptions} from 'discord.js';
-import path from 'path';
+import {MessageAttachment, MessageEmbed} from 'discord.js';
+import {AnyObject, CheckSizeContent, CheckSizeKey, Template, TemplatesValues} from './types'
 
-type AnyObject = {[k: string]: any};
-
-type Template = MessageEmbedOptions;
-type Templates = {[k in string | 'basic' | 'color' | 'complete' | 'image']: Template};
-
-type CheckSizeKey = keyof Template | string;
-type CheckSizeContent = Template[keyof Template];
-
-export const templates: Templates = {
-	basic: {
-		footer: {
-			text: '${client.user.username}',
-			iconURL: '${client.user.displayAvatarURL()}',
-		},
-		timestamp: new Date(),
-	},
-	color: {
-		color: '#4b5afd',
-	},
-	get complete() {
-		return {
-			...this.basic,
-			...this.color,
-			title: '${title}',
-			description: '${description}',
-		};
-	},
-	get image() {
-		return {
-			...this.complete,
-			image: {
-				url: '${image}',
-			},
-		};
-	},
+export const templates: TemplatesValues = {
+    basic: {
+        footer: {
+            text: '${client.user.username}',
+            iconURL: '${client.user.displayAvatarURL()}',
+        },
+        timestamp: new Date()
+    },
+    color: {
+        color: '#4b5afd'
+    },
+    //@ts-ignore
+    get complete() {
+        return {
+            ...this.basic,
+            ...this.color,
+            description: '${description}',
+            title: '${title}'
+        }
+    },
+    get image() {
+        return {
+            ...this.complete,
+            image: {
+                url: '${url}'
+            }
+        }
+    }
 };
 
 export const limits = {
@@ -54,6 +47,10 @@ export const limits = {
 	},
 };
 
+export type Templates = typeof templates
+type ValuesFromTemplateKey<T extends (string), P = Templates[T]> = P extends Template ? P['values'] : {};
+type Values<T extends (string) | Template> = T extends Template ? T['values'] : T extends string ? ValuesFromTemplateKey<T> : AnyObject | undefined;
+
 export class BetterEmbed extends MessageEmbed {
 	public static LENGTH_LIMITS = limits;
 	public static TEMPLATES = templates;
@@ -63,14 +60,18 @@ export class BetterEmbed extends MessageEmbed {
 		this.checkSize();
 	}
 
-	public static fromTemplate(template: keyof Templates | Template, values: AnyObject): BetterEmbed {
+    public static isTemplate(key: string): key is keyof Templates & string {
+        return templates[key] !== undefined;
+    }
+
+	public static fromTemplate<T extends (keyof Templates & string) | Template, V extends AnyObject | undefined = Values<T>>(template: T, values?: V): BetterEmbed {
 		if (typeof template === 'string')
-			if (templates[template]) template = templates[template];
+			if (templates[template]) template = templates[template] as T;
 			else throw new Error(`Template '${template}' not found.`);
 
 		template = JSON.parse(JSON.stringify(template));
 
-		function setValues(object: AnyObject, values: AnyObject): Template {
+		function setValues(object: AnyObject, values: AnyObject = {}): Template {
 			for (const [name, value] of Object.entries(object)) {
 				if (!object.hasOwnProperty(name)) continue;
 				if (Array.isArray(value)) object[name] = value.map(v => setValues(v, values));
@@ -153,15 +154,11 @@ export class BetterEmbed extends MessageEmbed {
 		}
 	}
 
-	public setImageFromFile(link: string) {
-		const attachment = new MessageAttachment(link, path.basename(link));
-		this.attachFiles([attachment]);
+	public setImageFromFile(attachment: MessageAttachment) {
 		this.setImage(`attachment://${attachment.name}`);
 	}
 
-	public setThumbnailFromFile(link: string) {
-		const attachment = new MessageAttachment(link, path.basename(link));
-		this.attachFiles([attachment]);
+	public setThumbnailFromFile(attachment: MessageAttachment) {
 		this.setThumbnail(`attachment://${attachment.name}`);
 	}
 
@@ -185,8 +182,7 @@ export class BetterEmbed extends MessageEmbed {
 					if (typeof tooLongFields === 'boolean') throw new RangeError(`Too much fields (${limits.fields.size}).`);
 					else {
 						const name = 'name' in tooLongFields ? 'value' : 'name';
-						// TODO : Find a fix for typings.
-						throw new RangeError(`'embed.fields[${tooLongFields.index}].${name}' is too long: ${(tooLongFields as any)[name]!.length}`);
+						throw new RangeError(`'embed.fields[${tooLongFields.index}].${name}' is too long: ${this.fields[tooLongFields.index][name].length} (max: ${tooLongFields.limit})`);
 					}
 			}
 		}
