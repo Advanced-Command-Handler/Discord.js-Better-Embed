@@ -4,17 +4,17 @@
 		"url": "https://github.com/Ayfri/Better-Embed/issues"
 	},
 	"dependencies": {
-		"discord.js": "^13.0.1"
+		"discord-api-types": "~0.37.101",
+		"discord.js": "^14.0.3"
 	},
 	"description": "A npm package that helps you create better Discord Embeds using discord.js.",
 	"devDependencies": {
-		"@types/node": "^16.4.13",
-		"prettier": "^2.3.2",
-		"typescript": "^4.3.5"
+		"@types/node": "^20.16.10",
 		"prettier": "^3.3.3",
+		"typescript": "^5.6.2"
 	},
 	"engines": {
-		"discord.js": ">=13.0.0"
+		"discord.js": ">=14.0.0"
 	},
 	"engineStrict": true,
 	"homepage": "https://github.com/Ayfri/Better-Embed",
@@ -23,8 +23,9 @@
 		"embed",
 		"discord-embed",
 		"better-embed",
+		"message-embed",
 		"embed-discord",
-        "v13"
+		"v14"
 	],
 	"main": "dist/index.js",
 	"name": "discord.js-better-embed",

@@ -1,4 +1,5 @@
-import {MessageAttachment, MessageEmbed} from 'discord.js';
+import type {APIEmbed} from 'discord-api-types/v10';
+import {AttachmentBuilder, Embed, EmbedBuilder} from 'discord.js';
 import {AnyObject, CheckSizeContent, CheckSizeKey, Template, TemplatesValues} from './types';
 
 export const templates: TemplatesValues = {
@@ -12,7 +13,7 @@ export const templates: TemplatesValues = {
 	color: {
 		color: '#4b5afd',
 	},
-	//@ts-ignore
+	// @ts-ignore
 	get complete() {
 		return {
 			...this.basic,
@@ -51,41 +52,86 @@ export type Templates = typeof templates;
 type ValuesFromTemplateKey<T extends string, P = Templates[T]> = P extends Template<infer V> ? V : {};
 type Values<T extends string | Template> = T extends Template<infer V> ? V : T extends string ? ValuesFromTemplateKey<T> : AnyObject | undefined;
 
-export class BetterEmbed extends MessageEmbed {
+// @ts-ignore
+export class BetterEmbed extends EmbedBuilder {
 	public static LENGTH_LIMITS = limits;
 	public static TEMPLATES = templates;
 
-	public constructor(data?: MessageEmbed | Template) {
+	public constructor(data?: APIEmbed | Template) {
 		super(data);
 		this.checkSize();
+	}
+
+	get author() {
+		return this.data.author as Embed['author'];
+	}
+
+	get color() {
+		return this.data.color;
+	}
+
+	get description() {
+		return this.data.description;
+	}
+
+	get fields() {
+		return this.data.fields as Embed['fields'];
+	}
+
+	get footer() {
+		return this.data.footer as Embed['footer'];
+	}
+
+	get image() {
+		return this.data.image as Embed['image'];
+	}
+
+	get thumbnail() {
+		return this.data.thumbnail as Embed['thumbnail'];
+	}
+
+	get title() {
+		return this.data.title;
+	}
+
+	get timestamp() {
+		return this.data.timestamp;
+	}
+
+	get url() {
+		return this.data.url;
 	}
 
 	public static isTemplate(key: string): key is keyof Templates & string {
 		return templates[key] !== undefined;
 	}
 
-	public static fromTemplate<T extends (keyof Templates & string) | Template, V extends AnyObject | undefined = Values<T>>(
-		template: T,
-		values?: V
-	): BetterEmbed {
-		if (typeof template === 'string')
-			if (templates[template]) template = templates[template] as T;
-			else throw new Error(`Template '${template}' not found.`);
+	public static fromTemplate<T extends (keyof Templates & string) | Template, V extends AnyObject | undefined = Values<T>>(template: T, values?: V): BetterEmbed {
+		if (typeof template === 'string') {
+			if (templates[template]) {
+				template = templates[template] as T;
+			} else {
+				throw new Error(`Template '${template}' not found.`);
+			}
+		}
 
 		template = JSON.parse(JSON.stringify(template));
 
 		function setValues(object: AnyObject, values: AnyObject = {}): Template {
 			for (const [name, value] of Object.entries(object)) {
 				if (!object.hasOwnProperty(name)) continue;
+
 				if (Array.isArray(value)) object[name] = value.map(v => setValues(v, values));
+				if (typeof value === 'number') {
+					object[name] = value;
+					continue;
+				}
 				if (typeof value === 'object') {
 					object[name] = setValues(value, values);
 					continue;
 				}
 
-				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => {
-					return values.hasOwnProperty(value.split('.')[0]) ? `\${values.${value}}` : value;
-				});
+				const code = value.replace(/\$\{([^}]+)\}/gu, (_: any, value: string) => (values.hasOwnProperty(value.split('.')[0]) ? `\${values.${value}}` : value));
 				object[name] = eval(`\`${code}\``);
 			}
 
@@ -95,12 +141,34 @@ export class BetterEmbed extends MessageEmbed {
 		return new BetterEmbed(setValues(template as AnyObject, values));
 	}
 
-	public checkSize(field: 'fields'): ({index: number; limit: number} & ({name: boolean} | {value: boolean})) | boolean;
+	public checkSize(field: 'fields'):
+		| ({
+				index: number;
+				limit: number;
+		  } & (
+				| {
+						name: boolean;
+				  }
+				| {
+						value: boolean;
+				  }
+		  ))
+		| boolean;
 	public checkSize(field: keyof Template): boolean;
-	public checkSize(): {[k in CheckSizeKey]: {content: CheckSizeContent; limit: number}};
+	public checkSize(): {
+		[k in CheckSizeKey]: {
+			content: CheckSizeContent;
+			limit: number;
+		};
+	};
 	public checkSize(field?: keyof Template) {
 		if (!field) {
-			const fields: {[k in CheckSizeKey]: {content: CheckSizeContent; limit: number}} = {};
+			const fields: {
+				[k in CheckSizeKey]: {
+					content: CheckSizeContent;
+					limit: number;
+				};
+			} = {};
 
 			function addField(name: CheckSizeKey, content: CheckSizeContent, limit: number) {
 				fields[name] = {
@@ -157,11 +225,11 @@ export class BetterEmbed extends MessageEmbed {
 		}
 	}
 
-	public setImageFromFile(attachment: MessageAttachment) {
+	public setImageFromFile(attachment: AttachmentBuilder) {
 		this.setImage(`attachment://${attachment.name}`);
 	}
 
-	public setThumbnailFromFile(attachment: MessageAttachment) {
+	public setThumbnailFromFile(attachment: AttachmentBuilder) {
 		this.setThumbnail(`attachment://${attachment.name}`);
 	}
 
@@ -182,29 +250,32 @@ export class BetterEmbed extends MessageEmbed {
 					throw new RangeError(`'embed.${name}' is too long: ${length} (max: ${limit}).`);
 				case 'fields':
 					const tooLongFields = this.checkSize(field);
-					if (typeof tooLongFields === 'boolean') throw new RangeError(`Too much fields (${limits.fields.size}).`);
-					else {
+					if (typeof tooLongFields === 'boolean') {
+						throw new RangeError(`Too much fields (${limits.fields.size}).`);
+					} else {
 						const name = 'name' in tooLongFields ? 'value' : 'name';
 						throw new RangeError(
-							`'embed.fields[${tooLongFields.index}].${name}' is too long: ${this.fields[tooLongFields.index][name].length} (max: ${
-								tooLongFields.limit
-							})`
+							`'embed.fields[${tooLongFields.index}].${name}' is too long: ${this.fields[tooLongFields.index][name].length} (max: ${tooLongFields.limit})`,
 						);
 					}
 			}
 		}
 
 		if (this.title && this.title.length > limits.title) throw new RangeError(`'embed.title' is too long: ${this.title.length} (max: ${limits.title}).`);
-		if (this.author?.name && this.author.name.length > limits.author.name)
+		if (this.author?.name && this.author.name.length > limits.author.name) {
 			throw new RangeError(`'embed.author.name' is too long: ${this.author.name.length} (max: ${limits.author.name}).`);
-		if (this.description && this.description.length > limits.description)
+		}
+		if (this.description && this.description.length > limits.description) {
 			throw new RangeError(`'embed.description' is too long: ${this.description.length} (max: ${limits.description}).`);
+		}
 		if (this.fields?.length > limits.fields.size) throw new RangeError(`Too much fields (${limits.fields.size}).`);
 		this.fields.forEach(field => {
-			if (field.name?.length > limits.fields.name)
+			if (field.name?.length > limits.fields.name) {
 				throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].name' is too long: ${field.name.length} (max: ${limits.fields.name}).`);
-			if (field.value?.length > limits.fields.value)
+			}
+			if (field.value?.length > limits.fields.value) {
 				throw new RangeError(`'embed.fields[${this.fields.indexOf(field)}].value' is too long: ${field.value.length} (max: ${limits.fields.value}).`);
+			}
 		});
 	}
 
@@ -214,10 +285,10 @@ export class BetterEmbed extends MessageEmbed {
 		}
 
 		if (this.author?.name) this.author.name = cutWithLength(this.author.name, limits.author.name);
-		if (this.description) this.description = cutWithLength(this.description, limits.description);
-		if (this.title) this.title = cutWithLength(this.title, limits.title);
+		if (this.description) this.setDescription(cutWithLength(this.description, limits.description));
+		if (this.title) this.setTitle(cutWithLength(this.title, limits.title));
 		if (this.fields) {
-			if (this.fields.length > limits.fields.size) this.fields = this.fields.slice(0, limits.fields.size) ?? [];
+			if (this.fields.length > limits.fields.size) this.setFields(this.fields.slice(0, limits.fields.size) ?? []);
 			this.fields.forEach(field => {
 				field.name = cutWithLength(field.name ?? '', limits.fields.name);
 				field.value = cutWithLength(field.value ?? '', limits.fields.value);
