@@ -5,10 +5,11 @@
 
 # Better-Embed
 
-A npm package for helping you create better Discord.js v13 Embeds.
+A npm package for helping you create better Discord.js v14 Embeds.
 
-> Note :<br>
-> Version `1.3.0` is not compatible with Discord.js v12, `1.2.1` is but is deprecated.
+> [!NOTE]
+> Version `1.3.0` is compatible with Discord.js v13, but is deprecated.<br>
+> Version `1.2.1` is compatible with Discord.js v12, but is deprecated.
 
 ## How to use + Documentation
 
