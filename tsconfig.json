@@ -2,14 +2,16 @@
 	"compilerOptions": {
 		"declaration": true,
 		"esModuleInterop": true,
-		"lib": ["ES2021"],
-		"module": "commonjs",
+		"lib": [
+			"ES2023"
+		],
+		"module": "NodeNext",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"outDir": "dist",
 		"rootDir": "src",
 		"skipLibCheck": true,
 		"strict": true,
-		"target": "ES2021"
+		"target": "ES2023"
 	}
 }
