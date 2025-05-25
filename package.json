@@ -4,7 +4,7 @@
 		"url": "https://github.com/Ayfri/Better-Embed/issues"
 	},
 	"dependencies": {
-		"discord-api-types": "~0.37.101",
+		"discord-api-types": "~0.38.2",
 		"discord.js": "^14.0.3"
 	},
 	"description": "A npm package that helps you create better Discord Embeds using discord.js.",
